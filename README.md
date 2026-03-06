@@ -3,7 +3,7 @@
 Stage 1 implementation includes:
 - hardcoded admin login
 - protected app shell with tabs
-- dashboard, weekly planner, paid traffic, admin users boilerplate pages
+- dashboard, weekly planner, paid traffic, and admin tools pages
 - basic Vercel-ready Next.js setup
 
 ## Local run
@@ -20,7 +20,8 @@ Stage 1 implementation includes:
 - `/dashboard`
 - `/planner`
 - `/paid`
-- `/admin/users` (admin-only placeholder)
+- `/tools` (admin-only user tools; add users and attach profile images)
+- `/admin/users` (legacy path redirected to `/tools`)
 
 ## Important
 These credentials are intentionally hardcoded only for initial validation. Stage 2 replaces this with secure database authentication and role management.

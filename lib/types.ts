@@ -33,5 +33,5 @@ export type AppUser = {
   email: string;
   role: "admin" | "worker";
   active: boolean;
+  profileImageUrl?: string;
 };
-

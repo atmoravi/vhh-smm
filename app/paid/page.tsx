@@ -3,10 +3,10 @@ import { weeklyPaid } from "@/lib/mock-data";
 import { requireSession } from "@/lib/auth";
 
 export default async function PaidTrafficPage() {
-  const { role } = await requireSession();
+  const { role, userName } = await requireSession();
 
   return (
-    <AppShell activePath="/paid" role={role} title="Paid Traffic">
+    <AppShell activePath="/paid" role={role} userName={userName} title="Paid Traffic">
       <section className="panel">
         <h2>Weekly Paid Performance (Manual Input Baseline)</h2>
         <table className="data-table">
@@ -35,4 +35,3 @@ export default async function PaidTrafficPage() {
     </AppShell>
   );
 }
-

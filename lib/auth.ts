@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 export const AUTH_COOKIE_NAME = "vh_smm_admin_session";
 export const AUTH_ROLE_COOKIE_NAME = "vh_smm_role";
+export const AUTH_USER_COOKIE_NAME = "vh_smm_user";
 export type UserRole = "admin" | "worker";
 
 // Hardcoded only for Stage 1 validation. Replace with database auth in Stage 2.
@@ -27,13 +28,18 @@ export async function getSessionRole(): Promise<UserRole | null> {
   return null;
 }
 
-export async function requireSession(): Promise<{ role: UserRole }> {
+export async function getSessionUserName(): Promise<string> {
+  const cookieStore = await cookies();
+  return cookieStore.get(AUTH_USER_COOKIE_NAME)?.value ?? "User";
+}
+
+export async function requireSession(): Promise<{ role: UserRole; userName: string }> {
   const isLoggedIn = await hasActiveSession();
   if (!isLoggedIn) {
     redirect("/login");
   }
 
   const role = await getSessionRole();
-  return { role: role ?? "worker" };
+  const userName = await getSessionUserName();
+  return { role: role ?? "worker", userName };
 }
-

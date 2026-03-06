@@ -3,14 +3,14 @@ import { requireSession } from "@/lib/auth";
 import { weeklyOrganic, weeklyPaid } from "@/lib/mock-data";
 
 export default async function DashboardPage() {
-  const { role } = await requireSession();
+  const { role, userName } = await requireSession();
   const latestOrganic = weeklyOrganic[weeklyOrganic.length - 1];
   const latestPaid = weeklyPaid[weeklyPaid.length - 1];
   const organicPerHour = Math.round(latestOrganic.views / latestOrganic.hoursSpent);
   const paidPerEur = Number((latestPaid.clicks / latestPaid.spendEur).toFixed(2));
 
   return (
-    <AppShell activePath="/dashboard" role={role} title="Dashboard">
+    <AppShell activePath="/dashboard" role={role} userName={userName} title="Dashboard">
       <div className="kpi-grid">
         <article className="kpi-card">
           <p className="kpi-label">Organic Views (Latest Week)</p>

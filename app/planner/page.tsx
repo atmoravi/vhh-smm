@@ -3,10 +3,10 @@ import { plannerItems } from "@/lib/mock-data";
 import { requireSession } from "@/lib/auth";
 
 export default async function PlannerPage() {
-  const { role } = await requireSession();
+  const { role, userName } = await requireSession();
 
   return (
-    <AppShell activePath="/planner" role={role} title="Weekly Planner">
+    <AppShell activePath="/planner" role={role} userName={userName} title="Weekly Planner">
       <section className="panel">
         <h2>Current Week Posts</h2>
         <table className="data-table">
@@ -37,4 +37,3 @@ export default async function PlannerPage() {
     </AppShell>
   );
 }
-
