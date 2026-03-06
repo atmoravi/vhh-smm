@@ -5,7 +5,11 @@
 - Hardcoded admin login for quick validation:
   - Login: `vhadmin`
   - Password: `Melone#2020#vhsmm`
-- Protected dashboard route.
+- Protected app shell and routes:
+  - Dashboard
+  - Weekly Planner
+  - Paid Traffic
+  - Admin Users (placeholder)
 - Top-left brand in dashboard: `VH SMM Tracker`.
 
 ## Stage 2 - Real Authentication + Roles
@@ -47,4 +51,3 @@
 - Role-based access tests.
 - CI checks in GitHub (lint, typecheck, tests).
 - Vercel env vars and deployment workflow.
-

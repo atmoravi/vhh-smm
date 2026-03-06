@@ -2,7 +2,8 @@
 
 Stage 1 implementation includes:
 - hardcoded admin login
-- protected dashboard
+- protected app shell with tabs
+- dashboard, weekly planner, paid traffic, admin users boilerplate pages
 - basic Vercel-ready Next.js setup
 
 ## Local run
@@ -14,6 +15,12 @@ Stage 1 implementation includes:
 - Login: `vhadmin`
 - Password: `Melone#2020#vhsmm`
 
+## Routes
+- `/login`
+- `/dashboard`
+- `/planner`
+- `/paid`
+- `/admin/users` (admin-only placeholder)
+
 ## Important
 These credentials are intentionally hardcoded only for initial validation. Stage 2 replaces this with secure database authentication and role management.
-
