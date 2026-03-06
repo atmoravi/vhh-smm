@@ -72,3 +72,17 @@ export const createPaidMetricSchema = z.object({
   leads: z.number().int().nonnegative().default(0),
   revenueEur: z.number().nonnegative().optional(),
 });
+
+export const upsertWorkRateSchema = z.object({
+  userId: z.string().min(1),
+  activityType: z.enum([
+    "CONTENT_PLANNING",
+    "CONTENT_CREATION",
+    "EDITING",
+    "COMMUNITY_MANAGEMENT",
+    "REPORTING",
+    "MEETING",
+    "OTHER",
+  ]),
+  hourlyRateEur: z.number().min(0).max(10000),
+});

@@ -40,6 +40,7 @@ After DB is connected:
 - `/planner`
 - `/timetable`
 - `/paid`
+- `/work-time-settings` (admin-only hourly rate settings)
 - `/tools` (admin-only user tools; add users and attach profile images)
 - `/admin/users` (legacy path redirected to `/tools`)
 
@@ -49,6 +50,7 @@ After DB is connected:
 - `GET/POST /api/time-entries`
 - `GET/POST /api/organic-posts`
 - `GET/POST /api/paid-metrics`
+- `GET/POST /api/work-rates`
 - `GET /api/health/db`
 
 ## Important

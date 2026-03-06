@@ -14,6 +14,7 @@ const TABS: TabConfig[] = [
   { href: "/planner", label: "Weekly Planner" },
   { href: "/timetable", label: "Timetable" },
   { href: "/paid", label: "Paid Traffic" },
+  { href: "/work-time-settings", label: "Work Time Settings", adminOnly: true },
   { href: "/tools", label: "Tools", adminOnly: true },
 ];
 

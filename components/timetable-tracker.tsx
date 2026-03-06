@@ -2,35 +2,14 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { UserRole } from "@/lib/auth";
-
-type ActivityOption = {
-  value:
-    | "CONTENT_CREATION"
-    | "COMMUNITY_MANAGEMENT"
-    | "CONTENT_PLANNING"
-    | "REPORTING"
-    | "MEETING"
-    | "OTHER"
-    | "EDITING";
-  label: string;
-};
-
-const ACTIVITY_OPTIONS: ActivityOption[] = [
-  { value: "CONTENT_CREATION", label: "Content Creation" },
-  { value: "COMMUNITY_MANAGEMENT", label: "Engagement/Community Mgmt" },
-  { value: "CONTENT_PLANNING", label: "Strategy & Planning" },
-  { value: "REPORTING", label: "Analytics & Reporting" },
-  { value: "EDITING", label: "Ad Management" },
-  { value: "MEETING", label: "Client Meetings" },
-  { value: "OTHER", label: "Admin/Misc" },
-];
+import { getTimeCategoryLabel, TIME_CATEGORY_OPTIONS, TimeCategoryValue } from "@/lib/time-categories";
 
 type TimeEntryItem = {
   id: string;
   userId: string;
   workDate: string;
   minutesSpent: number;
-  activityType: ActivityOption["value"];
+  activityType: TimeCategoryValue;
   notes?: string | null;
 };
 
@@ -49,15 +28,24 @@ function getCurrentDateInput() {
   return new Date().toISOString().split("T")[0];
 }
 
-function getActivityLabel(value: string) {
-  return ACTIVITY_OPTIONS.find((item) => item.value === value)?.label ?? value;
+function buildEmptyRates() {
+  return {
+    CONTENT_CREATION: 0,
+    COMMUNITY_MANAGEMENT: 0,
+    CONTENT_PLANNING: 0,
+    REPORTING: 0,
+    MEETING: 0,
+    OTHER: 0,
+    EDITING: 0,
+  } as Record<TimeCategoryValue, number>;
 }
 
 export function TimetableTracker({ userId, role }: TimetableTrackerProps) {
   const [logs, setLogs] = useState<TimeEntryItem[]>([]);
+  const [rates, setRates] = useState<Record<TimeCategoryValue, number>>(buildEmptyRates());
   const [workDate, setWorkDate] = useState(getCurrentDateInput());
   const [minutes, setMinutes] = useState("");
-  const [activityType, setActivityType] = useState<ActivityOption["value"]>("CONTENT_CREATION");
+  const [activityType, setActivityType] = useState<TimeCategoryValue>("CONTENT_CREATION");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
@@ -97,6 +85,39 @@ export function TimetableTracker({ userId, role }: TimetableTrackerProps) {
     };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRates() {
+      if (!userId && role !== "admin" && role !== "owner") {
+        return;
+      }
+      try {
+        const query = userId ? `?userId=${userId}` : "";
+        const response = await fetch(`/api/work-rates${query}`);
+        if (!response.ok) {
+          return;
+        }
+        const payload = (await response.json()) as {
+          rates: Array<{ activityType: TimeCategoryValue; hourlyRateEur: number }>;
+        };
+        if (cancelled) return;
+        const nextRates = buildEmptyRates();
+        for (const rate of payload.rates) {
+          nextRates[rate.activityType] = rate.hourlyRateEur;
+        }
+        setRates(nextRates);
+      } catch {
+        // Keep zero-rate defaults
+      }
+    }
+
+    loadRates();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, role]);
+
   const visibleLogs = useMemo(() => {
     if (role === "admin" || role === "owner") return logs;
     if (!userId) return [];
@@ -118,13 +139,22 @@ export function TimetableTracker({ userId, role }: TimetableTrackerProps) {
     const monthMins = monthLogs.reduce((sum, log) => sum + log.minutesSpent, 0);
 
     const categoryBreakdown = monthLogs.reduce<Record<string, number>>((acc, log) => {
-      const label = getActivityLabel(log.activityType);
+      const label = getTimeCategoryLabel(log.activityType);
       acc[label] = (acc[label] ?? 0) + log.minutesSpent;
       return acc;
     }, {});
 
-    return { weekMins, monthMins, categoryBreakdown };
-  }, [visibleLogs]);
+    const calcEarnings = (list: TimeEntryItem[]) =>
+      list.reduce((sum, item) => sum + (item.minutesSpent / 60) * (rates[item.activityType] ?? 0), 0);
+
+    return {
+      weekMins,
+      monthMins,
+      categoryBreakdown,
+      weekEarnings: calcEarnings(weekLogs),
+      monthEarnings: calcEarnings(monthLogs),
+    };
+  }, [visibleLogs, rates]);
 
   async function addLog(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -191,7 +221,7 @@ export function TimetableTracker({ userId, role }: TimetableTrackerProps) {
       <div className="timetable-left">
         <div className="panel">
           <h2>SMM Effort Tracker</h2>
-          <p className="note-line">Log daily minutes and track productivity.</p>
+          <p className="note-line">Log daily minutes and track productivity and earnings.</p>
 
           <div className="timetable-stats">
             <div className="planner-stat-card">
@@ -228,9 +258,9 @@ export function TimetableTracker({ userId, role }: TimetableTrackerProps) {
               <select
                 id="tt-category"
                 value={activityType}
-                onChange={(event) => setActivityType(event.target.value as ActivityOption["value"])}
+                onChange={(event) => setActivityType(event.target.value as TimeCategoryValue)}
               >
-                {ACTIVITY_OPTIONS.map((option) => (
+                {TIME_CATEGORY_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
@@ -257,8 +287,18 @@ export function TimetableTracker({ userId, role }: TimetableTrackerProps) {
 
         <div className="panel">
           <h2>Monthly Breakdown</h2>
+          <div className="earnings-strip">
+            <div>
+              <span>Weekly Earned</span>
+              <strong>{stats.weekEarnings.toFixed(2)} EUR</strong>
+            </div>
+            <div>
+              <span>Monthly Earned</span>
+              <strong>{stats.monthEarnings.toFixed(2)} EUR</strong>
+            </div>
+          </div>
           <div className="category-bars">
-            {ACTIVITY_OPTIONS.map((option) => {
+            {TIME_CATEGORY_OPTIONS.map((option) => {
               const value = stats.categoryBreakdown[option.label] ?? 0;
               const percentage = stats.monthMins > 0 ? (value / stats.monthMins) * 100 : 0;
               return (
@@ -288,6 +328,7 @@ export function TimetableTracker({ userId, role }: TimetableTrackerProps) {
               <th>Category</th>
               <th>Note</th>
               <th>Duration</th>
+              <th>Earned</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -295,9 +336,10 @@ export function TimetableTracker({ userId, role }: TimetableTrackerProps) {
             {visibleLogs.map((log) => (
               <tr key={log.id}>
                 <td>{new Date(log.workDate).toLocaleDateString()}</td>
-                <td>{getActivityLabel(log.activityType)}</td>
+                <td>{getTimeCategoryLabel(log.activityType)}</td>
                 <td>{log.notes || <span className="empty-note">No note</span>}</td>
                 <td>{formatTime(log.minutesSpent)}</td>
+                <td className="earn-cell">{((log.minutesSpent / 60) * (rates[log.activityType] ?? 0)).toFixed(2)} EUR</td>
                 <td>
                   <button className="button button-secondary tiny-button" type="button" onClick={() => deleteLog(log.id)}>
                     Delete
@@ -307,7 +349,7 @@ export function TimetableTracker({ userId, role }: TimetableTrackerProps) {
             ))}
             {!isLoading && visibleLogs.length === 0 ? (
               <tr>
-                <td colSpan={5} className="empty-row">
+                <td colSpan={6} className="empty-row">
                   No effort logs found. Start by adding one.
                 </td>
               </tr>

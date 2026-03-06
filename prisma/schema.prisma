@@ -57,6 +57,7 @@ model User {
   createdUsers    User[]        @relation("UserCreatedBy")
   authSessions    AuthSession[]
   timeEntries     TimeEntry[]
+  workRates       WorkRateSetting[]
   organicPosts    OrganicPost[] @relation("PostOwner")
 
   @@index([role, isActive])
@@ -168,4 +169,17 @@ model KpiWeeklySnapshot {
   updatedAt               DateTime @updatedAt
 
   @@unique([weekId])
+}
+
+model WorkRateSetting {
+  id            String           @id @default(cuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityType  TimeActivityType
+  hourlyRateEur Decimal          @db.Decimal(10, 2)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([userId, activityType])
+  @@index([userId])
 }
