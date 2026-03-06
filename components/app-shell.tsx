@@ -12,6 +12,7 @@ type TabConfig = {
 const TABS: TabConfig[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/planner", label: "Weekly Planner" },
+  { href: "/timetable", label: "Timetable" },
   { href: "/paid", label: "Paid Traffic" },
   { href: "/tools", label: "Tools", adminOnly: true },
 ];

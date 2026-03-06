@@ -38,6 +38,7 @@ After DB is connected:
 - `/login`
 - `/dashboard`
 - `/planner`
+- `/timetable`
 - `/paid`
 - `/tools` (admin-only user tools; add users and attach profile images)
 - `/admin/users` (legacy path redirected to `/tools`)
