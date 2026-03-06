@@ -24,8 +24,8 @@ export const createWeekSchema = z.object({
 });
 
 export const createTimeEntrySchema = z.object({
-  userId: z.string().min(1),
-  weekId: z.string().min(1),
+  userId: z.string().min(1).optional(),
+  weekId: z.string().min(1).optional(),
   activityType: z.enum([
     "CONTENT_PLANNING",
     "CONTENT_CREATION",

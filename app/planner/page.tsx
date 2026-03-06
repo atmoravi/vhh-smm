@@ -1,12 +1,15 @@
 import { AppShell } from "@/components/app-shell";
+import { PlannerTimeTracker } from "@/components/planner-time-tracker";
 import { plannerItems } from "@/lib/mock-data";
 import { requireSession } from "@/lib/auth";
 
 export default async function PlannerPage() {
-  const { role, userName } = await requireSession();
+  const { role, userName, userId } = await requireSession();
 
   return (
     <AppShell activePath="/planner" role={role} userName={userName} title="Weekly Planner">
+      <PlannerTimeTracker role={role} userId={userId} />
+
       <section className="panel">
         <h2>Current Week Posts</h2>
         <table className="data-table">
