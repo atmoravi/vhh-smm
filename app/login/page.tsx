@@ -42,7 +42,7 @@ export default function LoginPage() {
         <h1>VH SMM Tracker</h1>
         <form onSubmit={onSubmit}>
           <div className="field">
-            <label htmlFor="login">Login</label>
+            <label htmlFor="login">Email or Name</label>
             <input
               id="login"
               type="text"
@@ -68,10 +68,10 @@ export default function LoginPage() {
           <button className="button button-primary" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Signing in..." : "Log in"}
           </button>
+          <p className="note-line">Use the password set in Tools when the user was created.</p>
           {error ? <p className="error">{error}</p> : null}
         </form>
       </div>
     </main>
   );
 }
-
