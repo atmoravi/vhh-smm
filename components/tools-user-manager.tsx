@@ -36,12 +36,23 @@ function readStoredUsers(): AppUser[] {
   }
 }
 
+function generateStrongPassword(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
+  let output = "";
+  for (let i = 0; i < 12; i += 1) {
+    output += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return output;
+}
+
 export function ToolsUserManager() {
   const [users, setUsers] = useState<AppUser[]>(appUsers);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<RoleOption>("worker");
   const [active, setActive] = useState(true);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [imagePreview, setImagePreview] = useState<string>("");
   const [error, setError] = useState("");
 
@@ -74,6 +85,14 @@ export function ToolsUserManager() {
       setError("Name and email are required.");
       return;
     }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Password and confirm password must match.");
+      return;
+    }
 
     const normalizedEmail = email.trim().toLowerCase();
     if (users.some((user) => user.email.toLowerCase() === normalizedEmail)) {
@@ -88,6 +107,7 @@ export function ToolsUserManager() {
       role,
       active,
       profileImageUrl: imagePreview || undefined,
+      tempPassword: password,
     };
 
     setUsers((prev) => [newUser, ...prev]);
@@ -95,7 +115,17 @@ export function ToolsUserManager() {
     setEmail("");
     setRole("worker");
     setActive(true);
+    setPassword("");
+    setConfirmPassword("");
     setImagePreview("");
+  }
+
+  async function copyPassword(value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      setError("Unable to copy password.");
+    }
   }
 
   return (
@@ -103,6 +133,9 @@ export function ToolsUserManager() {
       <section className="panel">
         <h2>Tools: Add User</h2>
         <p>Create admin/worker users and attach a profile image (local UI storage for now).</p>
+        <p className="note-line">
+          Temporary: these credentials are stored in browser local storage until database auth is implemented.
+        </p>
 
         <form className="tools-form" onSubmit={onSubmit}>
           <div className="field">
@@ -141,6 +174,42 @@ export function ToolsUserManager() {
             <label htmlFor="tool-image">Profile Image</label>
             <input id="tool-image" type="file" accept="image/*" onChange={onImageChange} />
           </div>
+
+          <div className="field">
+            <label htmlFor="tool-password">Password</label>
+            <input
+              id="tool-password"
+              type="text"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Worker temporary password"
+              required
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="tool-password-confirm">Confirm Password</label>
+            <input
+              id="tool-password-confirm"
+              type="text"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              placeholder="Repeat password"
+              required
+            />
+          </div>
+
+          <button
+            className="button button-secondary"
+            type="button"
+            onClick={() => {
+              const generated = generateStrongPassword();
+              setPassword(generated);
+              setConfirmPassword(generated);
+            }}
+          >
+            Generate Password
+          </button>
 
           {imagePreview ? (
             <div className="image-preview-wrap">
@@ -181,6 +250,18 @@ export function ToolsUserManager() {
                 <p className="user-meta">
                   {user.role} · {user.active ? "active" : "inactive"}
                 </p>
+                {user.tempPassword ? (
+                  <div className="password-line">
+                    <code>{user.tempPassword}</code>
+                    <button
+                      className="button button-secondary tiny-button"
+                      type="button"
+                      onClick={() => copyPassword(user.tempPassword ?? "")}
+                    >
+                      Copy
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </article>
           ))}
@@ -189,4 +270,3 @@ export function ToolsUserManager() {
     </>
   );
 }
-

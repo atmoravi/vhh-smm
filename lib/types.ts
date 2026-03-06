@@ -34,4 +34,5 @@ export type AppUser = {
   role: "admin" | "worker";
   active: boolean;
   profileImageUrl?: string;
+  tempPassword?: string;
 };

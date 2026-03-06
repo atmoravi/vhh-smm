@@ -247,6 +247,12 @@ a {
   margin-top: 0;
 }
 
+.note-line {
+  margin-top: -4px;
+  color: #6a6a6a;
+  font-size: 13px;
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -334,4 +340,24 @@ a {
   margin: 0;
   color: #555;
   font-size: 13px;
+}
+
+.password-line {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-line code {
+  background: #f2f4f8;
+  border: 1px solid #dde3ea;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.tiny-button {
+  padding: 4px 8px;
+  font-size: 12px;
 }
