@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserRole } from "@/lib/auth";
+import { hasAdminAccess, UserRole } from "@/lib/auth";
 import { LogoutButton } from "@/components/logout-button";
 import { ProfileMenu } from "@/components/profile-menu";
 
@@ -36,7 +36,7 @@ export function AppShell({ activePath, role, userName, title, children }: AppShe
       </header>
 
       <nav className="tabs-nav">
-        {TABS.filter((tab) => !tab.adminOnly || role === "admin").map((tab) => (
+        {TABS.filter((tab) => !tab.adminOnly || hasAdminAccess(role)).map((tab) => (
           <Link
             key={tab.href}
             className={tab.href === activePath ? "tab-link active" : "tab-link"}

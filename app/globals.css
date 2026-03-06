@@ -94,6 +94,12 @@ a {
   font-size: 14px;
 }
 
+.success-line {
+  margin-top: 8px;
+  color: #167c2f;
+  font-size: 14px;
+}
+
 .dashboard-shell {
   min-height: 100vh;
   display: flex;

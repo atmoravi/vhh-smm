@@ -31,7 +31,7 @@ export type AppUser = {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "worker";
+  role: "admin" | "owner" | "manager" | "worker";
   active: boolean;
   profileImageUrl?: string;
   tempPassword?: string;

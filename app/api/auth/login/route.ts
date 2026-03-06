@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   AUTH_COOKIE_NAME,
   AUTH_ROLE_COOKIE_NAME,
+  AUTH_USER_ID_COOKIE_NAME,
   AUTH_USER_COOKIE_NAME,
   isValidAdminCredentials,
 } from "@/lib/auth";
@@ -42,6 +43,15 @@ export async function POST(request: Request) {
   response.cookies.set({
     name: AUTH_USER_COOKIE_NAME,
     value: login,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 12,
+  });
+  response.cookies.set({
+    name: AUTH_USER_ID_COOKIE_NAME,
+    value: "bootstrap-admin",
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

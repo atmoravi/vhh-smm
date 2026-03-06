@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { ToolsUserManager } from "@/components/tools-user-manager";
-import { requireSession } from "@/lib/auth";
+import { hasAdminAccess, requireSession } from "@/lib/auth";
 
 export default async function ToolsPage() {
   const { role, userName } = await requireSession();
-  if (role !== "admin") {
+  if (!hasAdminAccess(role)) {
     redirect("/dashboard");
   }
 
@@ -15,4 +15,3 @@ export default async function ToolsPage() {
     </AppShell>
   );
 }
-
