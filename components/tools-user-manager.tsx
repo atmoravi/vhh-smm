@@ -67,7 +67,10 @@ export function ToolsUserManager() {
     async function loadUsers() {
       try {
         const response = await fetch("/api/users", { method: "GET" });
-        if (!response.ok) throw new Error("DB unavailable");
+        if (!response.ok) {
+          const payload = (await response.json().catch(() => ({}))) as { error?: string };
+          throw new Error(payload.error ?? `Unable to load users (HTTP ${response.status}).`);
+        }
         const payload = (await response.json()) as {
           users: Array<{
             id: string;
@@ -94,6 +97,11 @@ export function ToolsUserManager() {
         if (cancelled) return;
         setDbMode(false);
         setUsers(readStoredUsers());
+        if (!cancelled) {
+          setError(
+            "Database mode unavailable. Check /api/health/db and Vercel env vars. Running in local fallback.",
+          );
+        }
       }
     }
 
@@ -204,7 +212,7 @@ export function ToolsUserManager() {
         setInfo("User saved to database.");
       } else {
         setUsers((prev) => [newUser, ...prev]);
-        setInfo("Database not connected yet. User saved in local browser storage.");
+        setInfo("Database mode is off. User saved in local browser storage.");
       }
 
       setName("");
@@ -374,4 +382,3 @@ export function ToolsUserManager() {
     </>
   );
 }
-
